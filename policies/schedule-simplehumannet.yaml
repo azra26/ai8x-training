@@ -1,0 +1,11 @@
+lr_schedulers:
+  training_lr:
+    class: ExponentialLR
+    gamma: 0.96
+
+policies:
+  - lr_scheduler:
+      instance_name: training_lr
+    starting_epoch: 0
+    ending_epoch: 20
+    frequency: 1

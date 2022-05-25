@@ -1,0 +1,3 @@
+#!/bin/sh
+python train.py --epochs 30 --optimizer Adam --lr 0.0001 --weight-decay 0.05 --compress policies/schedule-simplehumannet.yaml --enable-tensorboard --pr-curves --model ai85simplehumannet --dataset humans_vs_robots_simplenet --device MAX78000 --batch-size 128 --print-freq 100 --confusion --qat-policy policies/qat_policy_simplehumannet.yaml --param-hist --use-bias "$@"
+
