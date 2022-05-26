@@ -32,7 +32,7 @@ class new_model(nn.Module):
     ):
         super().__init__()
 
-        self.drop = nn.Dropout2d(p=0.2)
+        self.drop = nn.Dropout2d(p=0.5)
         self.conv1 = ai8x.FusedConv2dReLU(num_channels, 24, 3, stride=1, padding=1, bias=False, #bias=bias
                                             **kwargs)
         self.conv2 = ai8x.FusedConv2dReLU(24, 32, 3, stride=1, padding=1, bias=False, **kwargs)
