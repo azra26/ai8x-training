@@ -39,11 +39,11 @@ def get_datasets(data, load_train=True, load_test=True):
     if load_train:
         train_transform = transforms.Compose([
             transforms.Resize((64,64)), #
-            #transforms.RandomCrop((64,64), padding=4), #uncomment to data augment
-            #transforms.RandomHorizontalFlip(),
-            #transforms.RandomRotation(degrees=10),
-            #transforms.ColorJitter(brightness=0.2),
-            #transforms.GaussianBlur((3,3),(0.1,1)), 
+            transforms.RandomCrop((64,64), padding=4), #uncomment to data augment
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomRotation(degrees=10),
+            transforms.ColorJitter(brightness=0.2),
+            transforms.GaussianBlur((3,3),(0.1,1)), 
             transforms.ToTensor(),
             ai8x.normalize(args=args)
         ])
