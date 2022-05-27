@@ -1,0 +1,16 @@
+start_epoch: 20
+shift_quantile: 0.985
+weight_bits: 2
+overrides:
+        conv1:
+                weight_bits: 8
+        conv2:
+                weight_bits: 4
+        conv13:
+                weight_bits: 4
+        conv14:
+                weight_bits: 4
+        conv15:
+                weight_bits: 4
+        conv16:
+                weight_bits: 4
