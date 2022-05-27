@@ -40,19 +40,23 @@ class new_model(nn.Module):
         self.conv4 = ai8x.FusedConv2dBNReLU(32, 32, 3, stride=1, padding=1, bias=bias, **kwargs)
         self.conv5 = ai8x.FusedMaxPoolConv2dBNReLU(32, 32, 3, pool_size=2, pool_stride=2,
                                                    stride=1, padding=1, bias=bias, **kwargs)
-        self.conv6 = ai8x.FusedConv2dBNReLU(32, 32, 3, stride=1, padding=1, bias=bias, **kwargs)
-        self.conv7 = ai8x.FusedConv2dBNReLU(32, 64, 3, stride=1, padding=1, bias=bias, **kwargs)
-        self.conv8 = ai8x.FusedMaxPoolConv2dBNReLU(64, 64, 3, pool_size=2, pool_stride=2,
+        self.conv6 = ai8x.FusedMaxPoolConv2dBNReLU(32, 32, 3, pool_size=2, pool_stride=2,
                                                    stride=1, padding=1, bias=bias, **kwargs)
-        self.conv9 = ai8x.FusedConv2dBNReLU(64, 64, 3, stride=1, padding=1, bias=bias, **kwargs)
-        self.conv10 = ai8x.FusedMaxPoolConv2dBNReLU(64, 128, 3, pool_size=2, pool_stride=2,
+        self.conv7 = ai8x.FusedMaxPoolConv2dBNReLU(32, 32, 3, pool_size=2, pool_stride=2,
+                                                   stride=1, padding=1, bias=bias, **kwargs)
+        self.conv8 = ai8x.FusedConv2dBNReLU(32, 32, 3, stride=1, padding=1, bias=bias, **kwargs)
+        self.conv9 = ai8x.FusedConv2dBNReLU(32, 64, 3, stride=1, padding=1, bias=bias, **kwargs)
+        self.conv10 = ai8x.FusedMaxPoolConv2dBNReLU(64, 64, 3, pool_size=2, pool_stride=2,
+                                                   stride=1, padding=1, bias=bias, **kwargs)
+        self.conv11 = ai8x.FusedConv2dBNReLU(64, 64, 3, stride=1, padding=1, bias=bias, **kwargs)
+        self.conv12 = ai8x.FusedMaxPoolConv2dBNReLU(64, 128, 3, pool_size=2, pool_stride=2,
                                                     stride=1, padding=1, bias=bias, **kwargs)
-        self.conv11 = ai8x.FusedMaxPoolConv2dBNReLU(128, 512, 1, pool_size=2, pool_stride=2,
+        self.conv13 = ai8x.FusedMaxPoolConv2dBNReLU(128, 512, 1, pool_size=2, pool_stride=2,
                                                     padding=0, bias=bias, **kwargs)
-        self.conv12 = ai8x.FusedConv2dBNReLU(512, 192, 1, stride=1, padding=0, bias=bias, **kwargs)
-        self.conv13 = ai8x.FusedMaxPoolConv2dBNReLU(192, 192, 3, pool_size=2, pool_stride=2,
+        self.conv14 = ai8x.FusedConv2dBNReLU(512, 192, 1, stride=1, padding=0, bias=bias, **kwargs)
+        self.conv15 = ai8x.FusedMaxPoolConv2dBNReLU(192, 192, 3, pool_size=2, pool_stride=2,
                                                     stride=1, padding=1, bias=bias, **kwargs)
-        self.conv14 = ai8x.Conv2d(192, num_classes, 1, stride=1, padding=0, bias=bias,
+        self.conv16 = ai8x.Conv2d(192, num_classes, 1, stride=1, padding=0, bias=bias,
                                   wide=True, **kwargs)
 
     def forward(self, x):  # pylint: disable=arguments-differ
@@ -62,8 +66,6 @@ class new_model(nn.Module):
         x = self.conv3(x)
         x = self.conv4(x)
         x = self.conv5(x)
-        x = self.conv5(x)
-        x = self.conv5(x)
         x = self.conv6(x)
         x = self.conv7(x)
         x = self.conv8(x)
@@ -71,9 +73,11 @@ class new_model(nn.Module):
         x = self.conv10(x)
         x = self.conv11(x)
         x = self.conv12(x)
-        x = self.drop(x)
         x = self.conv13(x)
         x = self.conv14(x)
+        x = self.drop(x)
+        x = self.conv15(x)
+        x = self.conv16(x)
         x = x.view(x.size(0), -1)
         return x
 
