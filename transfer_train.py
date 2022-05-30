@@ -130,6 +130,27 @@ weight_sum = None
 weight_stddev = None
 weight_mean = None
 
+def count_params(model):
+    """Count Model Parameters"""
+    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+    params = sum([np.prod(p.size()) for p in model_parameters])
+    return params
+
+def freeze_layer(layer):
+    """Freezing of Layer"""
+    layer.op.weight.requires_grad_(False)
+    layer.op.bias.requires_grad_(False)
+
+def unfreeze_layer(layer):
+    """Unfreezing of Layer"""
+    layer.op.weight.requires_grad_(True)
+    layer.op.bias.requires_grad_(True)
+
+def print_model_params(model):
+    """Print Model Parameters"""
+    print('Layer, Size, Requires Grad:')
+    for name, param in model.named_parameters():
+        print(name, ',', param.size(),',', param.requires_grad)
 
 def main():
     """main"""
@@ -272,6 +293,54 @@ def main():
 
     model = create_model(supported_models, dimensions, args)
 
+    # Get policy for quantization aware training
+    qat_policy = parse_qat_yaml.parse(args.qat_policy) \
+        if args.qat_policy.lower() != "none" else None
+
+    # Get policy for once for all training policy
+    nas_policy = parse_nas_yaml.parse(args.nas_policy) \
+        if args.nas and args.nas_policy.lower() != '' else None
+
+    # Updating Model Parameters from Checkpoint
+    TL_CHECKPOINT = "trained/ai85-cifar100-new.pth.tar"  # Edit filename here
+    optimizer = None
+    update_old_model_params(TL_CHECKPOINT, model)
+    if qat_policy is not None:
+        checkpoint = torch.load(TL_CHECKPOINT,
+                                map_location=lambda storage, loc: storage)
+        # pylint: disable=unsubscriptable-object
+        if checkpoint.get('epoch', None) >= qat_policy['start_epoch']:
+            ai8x.fuse_bn_layers(model)
+        # pylint: enable=unsubscriptable-object
+    print(model.state_dict)
+    model, compression_scheduler, optimizer, start_epoch = apputils.load_checkpoint(
+        model, TL_CHECKPOINT, model_device=args.device)
+
+    # Print Original Model Parameters
+    print('---Original Parameters---')
+    print_model_params(model)
+    
+    # CIFAR 100 NAS Model
+    freeze_layer(model.conv1_1)
+    freeze_layer(model.conv1_2)
+    freeze_layer(model.conv1_3)
+    freeze_layer(model.conv2_1)
+    freeze_layer(model.conv2_2)
+    freeze_layer(model.conv3_1)
+    freeze_layer(model.conv3_2)
+    freeze_layer(model.conv4_1)
+    freeze_layer(model.conv4_2)
+    # freeze_layer(model.conv5_1)
+    # freeze_layer(model.fc)
+    
+    # Update the model
+    model.to(args.device)
+    ai8x.update_model(model)
+
+    # Print Original Model Parameters
+    print('---Modified Parameters---')
+    print_model_params(model)
+
     # if args.add_logsoftmax:
     #     model = nn.Sequential(model, nn.LogSoftmax(dim=1))
     # if args.add_softmax:
@@ -302,14 +371,6 @@ def main():
     # Capture thresholds for early-exit training
     if args.earlyexit_thresholds:
         msglogger.info('=> using early-exit threshold values of %s', args.earlyexit_thresholds)
-
-    # Get policy for quantization aware training
-    qat_policy = parse_qat_yaml.parse(args.qat_policy) \
-        if args.qat_policy.lower() != "none" else None
-
-    # Get policy for once for all training policy
-    nas_policy = parse_nas_yaml.parse(args.nas_policy) \
-        if args.nas and args.nas_policy.lower() != '' else None
 
     # We can optionally resume from a checkpoint
     optimizer = None
