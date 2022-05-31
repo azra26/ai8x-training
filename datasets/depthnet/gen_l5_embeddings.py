@@ -95,7 +95,7 @@ def main(source_path, dest_path):  # pylint: disable=too-many-locals
             img = cv2.imread(image_path)
             out_img, out_embed = midas.get_output(img, (32,32))
             
-            img_list.append(out_img)
+            img_list.append(img)
             embed_list.append(out_embed)
             
             # Normalized Image and Save Output
