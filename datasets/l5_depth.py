@@ -79,6 +79,7 @@ class L5DepthDataset(data.Dataset):
 
     def __getitem__(self, idx):
         inp = torch.Tensor(self.__normalize_data(self.img_list[idx]))
+        inp = inp.permute(2, 0, 1)
         if self.transform is not None:
             inp = self.transform(inp)
         
