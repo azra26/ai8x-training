@@ -46,9 +46,9 @@ class AI85DepthNet(nn.Module):
                                                  stride=1, padding=1, bias=bias, **kwargs)
         self.conv7 = ai8x.FusedMaxPoolConv2dReLU(64, 64, 3, pool_size=2, pool_stride=2,
                                                  padding=1, bias=bias, **kwargs)
-        self.conv8 = ai8x.FusedMaxPoolConv2d(64, 512, 1, pool_size=2, pool_stride=2,
+        self.conv8 = ai8x.FusedMaxPoolConv2d(64, 64, 1, pool_size=2, pool_stride=2,
                                              padding=0, bias=False, **kwargs)
-        self.fc1 = ai8x.Linear(512, 1024, bias=bias, wide=True, **kwargs)                                         
+        self.fc1 = ai8x.Linear(64, 1024, bias=bias, wide=True, **kwargs)                                         
     
 
     def forward(self, x):  # pylint: disable=arguments-differ
